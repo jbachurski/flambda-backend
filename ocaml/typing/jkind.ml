@@ -18,9 +18,11 @@ open Jkind_types
 [@@@warning "+9"]
 
 module Type = struct
+  open Jkind_types.Type
+
   (* A *sort* is the information the middle/back ends need to be able to
      compile a manipulation (storing, passing, etc) of a runtime value. *)
-  module Sort = Jkind_types.Sort
+  module Sort = Jkind_types.Type.Sort
 
   type sort = Sort.t
 
@@ -33,7 +35,7 @@ module Type = struct
      unrepresentable layout. The only unrepresentable layout is `any`, which is
      the top of the layout lattice. *)
   module Layout = struct
-    open Jkind_types.Layout
+    open Jkind_types.Type.Layout
 
     type nonrec 'sort layout = 'sort layout
 
@@ -84,7 +86,7 @@ module Type = struct
 
       module Legacy = struct
         (* CR layouts v2.8: get rid of this *)
-        type t = Jkind_types.Layout.Const.Legacy.t =
+        type t = Jkind_types.Type.Layout.Const.Legacy.t =
           | Any
           | Value
           | Void
@@ -121,7 +123,7 @@ module Type = struct
         match Sort.equate_tracking_mutation s1 s2 with
         | (Equal_mutated_first | Equal_mutated_second) when not allow_mutation
           ->
-          Misc.fatal_errorf "Jkind.Type.equal: Performed unexpected mutation"
+          Misc.fatal_errorf "Jkind.equal: Performed unexpected mutation"
         | Unequal -> false
         | Equal_no_mutation | Equal_mutated_first | Equal_mutated_second -> true
         )
@@ -155,7 +157,7 @@ module Type = struct
   end
 
   module Externality = struct
-    type t = Jkind_types.Externality.t =
+    type t = Jkind_types.Type.Externality.t =
       | External
       | External64
       | Internal
@@ -223,7 +225,7 @@ module Type = struct
   end
 
   (* forward declare [Const.t] so we can use it for [Error.t] *)
-  type const = type_expr Jkind_types.Const.t
+  type const = type_expr Jkind_types.Type.Const.t
 
   (******************************)
   (*** user errors ***)
@@ -247,7 +249,7 @@ module Type = struct
   let raise ~loc err = raise (Error.User_error (loc, err))
 
   module Const = struct
-    open Jkind_types.Const
+    open Jkind_types.Type.Const
 
     type t = const
 
@@ -662,7 +664,7 @@ module Type = struct
   end
 
   module Jkind_desc = struct
-    open Jkind_types.Jkind_desc
+    open Jkind_types.Type.Jkind_desc
 
     let of_const
         ({ layout; modes_upper_bounds; externality_upper_bound } : Const.t) =
@@ -807,7 +809,7 @@ module Type = struct
     end
   end
 
-  type t = type_expr Jkind_types.t
+  type t = type_expr Jkind_types.Type.t
 
   let fresh_jkind jkind ~why =
     { jkind; history = Creation why; has_warned = false }
@@ -1008,7 +1010,7 @@ module Type = struct
   let sort_of_jkind l =
     match get l with
     | Const { layout = Sort s; _ } -> Sort.of_const s
-    | Const { layout = Any; _ } -> Misc.fatal_error "Jkind.Type.sort_of_jkind"
+    | Const { layout = Any; _ } -> Misc.fatal_error "Jkind.sort_of_jkind"
     | Var v -> Sort.of_var v
 
   let get_layout jk : Layout.Const.t option =

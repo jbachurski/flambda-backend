@@ -36,14 +36,16 @@ module Type : sig
      to the type checker; something external to the type checker can be skipped
      during garbage collection.
 
-     This will eventually be incorporated into the mode
-     solver, but it is defined here because we do not yet track externalities
-     on expressions, just in jkinds. *)
-  (* CR externals: Move to mode.ml. But see
-     https://github.com/goldfirere/flambda-backend/commit/d802597fbdaaa850e1ed9209a1305c5dcdf71e17
-     first, which was reisenberg's attempt to do so. *)
+   This will eventually be incorporated into the mode
+   solver, but it is defined here because we do not yet track externalities
+   on expressions, just in jkinds. *)
+(* CR externals: Move to mode.ml. But see
+   https://github.com/goldfirere/flambda-backend/commit/d802597fbdaaa850e1ed9209a1305c5dcdf71e17
+   first, which was reisenberg's attempt to do so. *)
+
+module Type : sig
   module Externality : sig
-    type t = Jkind_types.Externality.t =
+    type t = Jkind_types.Type.Externality.t =
       | External (* not managed by the garbage collector *)
       | External64 (* not managed by the garbage collector on 64-bit systems *)
       | Internal (* managed by the garbage collector *)
@@ -53,7 +55,7 @@ module Type : sig
     val print : Format.formatter -> t -> unit
   end
 
-  module Sort : Jkind_intf.Sort with type const = Jkind_types.Sort.const
+  module Sort : Jkind_intf.Sort with type const = Jkind_types.Type.Sort.const
 
   type sort = Sort.t
 
@@ -61,7 +63,7 @@ module Type : sig
      indeterminate [Any] or a sort, which is a concrete memory layout. *)
   module Layout : sig
     module Const : sig
-      type t = Jkind_types.Layout.Const.t
+      type t = Jkind_types.Type.Layout.Const.t
 
       val get_sort : t -> Sort.Const.t option
 
@@ -69,7 +71,7 @@ module Type : sig
 
       (* CR layouts v2.8: remove this *)
       module Legacy : sig
-        type t = Jkind_types.Layout.Const.Legacy.t =
+        type t = Jkind_types.Type.Layout.Const.Legacy.t =
           | Any
           | Value
           | Void
@@ -86,10 +88,10 @@ module Type : sig
     end
   end
 
-  (** A Jkind.Type.t is a full description of the runtime representation of values
+  (** A Jkind.t is a full description of the runtime representation of values
     of a given type. It includes sorts, but also the abstract top jkind
     [Any] and subjkinds of other sorts, such as [Immediate]. *)
-  type t = Types.type_expr Jkind_types.t
+  type t = Types.type_expr Jkind_types.Type.t
 
   module History : sig
     include module type of struct
@@ -155,7 +157,7 @@ module Type : sig
 
   module Const : sig
     (** Constant jkinds are used for user-written annotations *)
-    type t = Types.type_expr Jkind_types.Const.t
+    type t = Types.type_expr Jkind_types.Type.Const.t
 
     val to_out_jkind_const : t -> Outcometree.out_jkind_const
 
@@ -295,7 +297,7 @@ module Type : sig
     Const.t
 
   (** The typed jkind together with its user-written annotation. *)
-  type annotation = Types.type_expr Jkind_types.annotation
+  type annotation = Types.type_expr Jkind_types.Type.annotation
 
   val of_annotation :
     context:History.annotation_context ->
@@ -355,7 +357,7 @@ module Type : sig
       | Var of Sort.var
   end
 
-  (** Extract the [const] from a [Jkind.Type.t], looking through unified
+  (** Extract the [const] from a [Jkind.t], looking through unified
     sort variables. Returns [Var] if the final, non-variable jkind has not
     yet been determined. *)
   val get : t -> Desc.t
