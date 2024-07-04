@@ -1638,7 +1638,7 @@ let rec instance_prim_locals locals mvar macc finalret ty =
    function returns [ty] unchanged otherwise.
 
    When making the copy, all generic type variables with jkind [any] will be
-   modified to have a sort var jkind. The same sort var will be used for all
+   modified to have a sort var Jkind.Type. The same sort var will be used for all
    such rewrites.
 
    The copy should also have the same level information as [ty].  This is done
@@ -1659,7 +1659,7 @@ let instance_prim_layout (desc : Primitive.description) ty =
   let new_sort_and_jkind = ref None in
   let get_jkind () =
     (* CR layouts v2.8: This should replace only the layout component of the
-       jkind. It's possible that we might want a primitive that accepts a
+       Jkind.Type. It's possible that we might want a primitive that accepts a
        mode-crossing, layout-polymorphic parameter. *)
     match !new_sort_and_jkind with
     | Some (_, jkind) ->
@@ -2060,7 +2060,7 @@ let get_unboxed_type_approximation env ty =
   | Ok ty | Error ty -> ty
 
 (* When computing a jkind, we distinguish two cases because some callers might
-   want to update the jkind.
+   want to update the Jkind.Type.
    - Jkind: We compute the jkind, and the type wasn't a variable.
    - Var: The type was a var, we return the jkind and the type_expr it was in,
      in case the caller wants to update it. *)
@@ -3195,7 +3195,7 @@ let add_jkind_equation ~reason env destination jkind1 =
   (* Here we check whether the source and destination jkinds intersect.  If
      they don't, we can give a type error.  If they do, and destination is
      abstract, we can improve type checking by assigning destination that
-     jkind. *)
+     Jkind.Type. *)
   match intersect_type_jkind ~reason !env destination jkind1 with
   | Error err -> raise_for Unify (Bad_jkind (destination,err))
   | Ok jkind -> begin

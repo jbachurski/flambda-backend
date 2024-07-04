@@ -157,13 +157,9 @@ type 'a arrow =
     result : 'a
   }
 
-module Jkind_desc : sig
-  type 'type_expr t =
-    | Type of 'type_expr Type.Jkind_desc.t
-    | Arrow of 'type_expr t arrow
-end
-
-type 'type_expr t = { jkind : 'type_expr Jkind_desc.t }
+type 'type_expr t =
+  | Type of 'type_expr Type.t
+  | Arrow of 'type_expr t arrow
 
 module Const : sig
   type 'type_expr t =
