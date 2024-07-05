@@ -43,6 +43,8 @@ module Type : sig
    https://github.com/goldfirere/flambda-backend/commit/d802597fbdaaa850e1ed9209a1305c5dcdf71e17
    first, which was reisenberg's attempt to do so. *)
 
+exception Unexpected_higher_jkind
+
 module Type : sig
   module Externality : sig
     type t = Jkind_types.Type.Externality.t =
@@ -595,6 +597,9 @@ val of_type_decl_default :
   default:t ->
   Parsetree.type_declaration ->
   t * annotation option * Parsetree.attributes
+
+(** Assert this jkind is not higher order - it is a type jkind. Raises otherwise. *)
+val to_type_jkind : t -> Type.t
 
 (******************************)
 (* elimination and defaulting *)
