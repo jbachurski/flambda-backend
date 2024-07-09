@@ -357,10 +357,6 @@ module Type : sig
   val format_history :
     intro:(Format.formatter -> unit) -> Format.formatter -> t -> unit
 
-  (** Provides the [Printtyp.path] formatter back up the dependency chain to
-    this module. *)
-  val set_printtyp_path : (Format.formatter -> Path.t -> unit) -> unit
-
   (******************************)
   (* relations *)
 
@@ -595,6 +591,10 @@ val format : Format.formatter -> t -> unit
     The [intro] is something like "The jkind of t is". *)
 val format_history :
   intro:(Format.formatter -> unit) -> Format.formatter -> t -> unit
+
+(** Provides the [Printtyp.path] formatter back up the dependency chain to
+    this module. *)
+val set_printtyp_path : (Format.formatter -> Path.t -> unit) -> unit
 
 (******************************)
 (* errors *)
