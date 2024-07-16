@@ -52,12 +52,12 @@ module Type = struct
   open Jkind_types.Type
 
   (* A *sort* is the information the middle/back ends need to be able to
-   compile a manipulation (storing, passing, etc) of a runtime value. *)
-   module Sort = Jkind_types.Type.Sort
+     compile a manipulation (storing, passing, etc) of a runtime value. *)
+  module Sort = Jkind_types.Type.Sort
 
-   type sort = Sort.t
+  type sort = Sort.t
 
-   type type_expr = Types.type_expr
+  type type_expr = Types.type_expr
 
   (* A *layout* of a type describes the way values of that type are stored at
      runtime, including details like width, register convention, calling
@@ -1615,7 +1615,8 @@ module History = struct
         { args = List.map (fun t' -> update_reason t' reason) args;
           result = update_reason result reason
         }
-end (* module Type *)
+end
+(* module Type *)
 
 (* Re-export some symbols *)
 
@@ -1623,7 +1624,6 @@ type sort = Type.sort
 
 module Sort = Type.Sort
 module Externality = Type.Externality
-
 
 (******************************)
 (* constants *)
@@ -1704,7 +1704,8 @@ module Const = struct
     | Abbreviation const ->
       Type (Type.Const.of_user_written_abbreviation ~jkind const)
     | Mod (jkind, modes) ->
-      (* FIXME jbachurski: What should be the interaction between [mod] and arrow kinds? *)
+      (* jbachurski: We coerce here - in the future, the syntax should not permit
+         mod on arrows. Such expressions are not parsed currently. *)
       let jkind =
         to_type_jkind (of_user_written_annotation_unchecked_level jkind)
       in
@@ -1865,7 +1866,7 @@ module Desc = struct
   (** The description of a jkind, used as a return type from [get]. *)
   type nonrec t =
     | Type of Type.t
-    | Arrow of t Jkind_types.arrow
+    | Arrow of t Jkind_types.Arrow.t
 end
 
 let rec default_to_value_and_get (t : t) : Const.t =
@@ -2064,8 +2065,8 @@ let equal = equate_or_equal ~allow_mutation:true
 (* Generalises union and intersection at Arrows, as they are mutually recursive when
    defining Arrow kind intersection *)
 let arrow_connective_or_error ~on_args ~on_result
-    ({ args = args1; result = result1 } : _ Jkind_types.arrow)
-    ({ args = args2; result = result2 } : _ Jkind_types.arrow) =
+    ({ args = args1; result = result1 } : _ Jkind_types.Arrow.t)
+    ({ args = args2; result = result2 } : _ Jkind_types.Arrow.t) =
   let args = List.map2 on_args args1 args2 in
   let result = on_result result1 result2 in
   (* FIXME jbachurski: collect all errors rather than picking first? *)
